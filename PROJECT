@@ -1,0 +1,10 @@
+version: "2"
+domain: tattletale.dev
+repo: tattletale
+resources:
+- group: tattletale
+  version: v1beta1
+  kind: SharedConfigMap
+- group: tattletale
+  version: v1beta1
+  kind: SharedSecret

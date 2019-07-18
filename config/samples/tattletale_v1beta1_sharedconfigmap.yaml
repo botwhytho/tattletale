@@ -1,0 +1,7 @@
+apiVersion: tattletale.tattletale.dev/v1beta1
+kind: SharedConfigMap
+metadata:
+  name: sharedconfigmap-sample
+spec:
+  # Add fields here
+  foo: bar
