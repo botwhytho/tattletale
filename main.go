@@ -37,7 +37,7 @@ var (
 
 func init() {
 
-	tattletalev1beta1.AddToScheme(scheme)
+	_ = tattletalev1beta1.AddToScheme(scheme)
 	// +kubebuilder:scaffold:scheme
 }
 
@@ -64,19 +64,22 @@ func main() {
 	err = (&controllers.SharedConfigMapReconciler{
 		Client: mgr.GetClient(),
 		Log:    ctrl.Log.WithName("controllers").WithName("SharedConfigMap"),
+		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr)
 	if err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "SharedConfigMap")
 		os.Exit(1)
 	}
-	err = (&controllers.SharedSecretReconciler{
-		Client: mgr.GetClient(),
-		Log:    ctrl.Log.WithName("controllers").WithName("SharedSecret"),
-	}).SetupWithManager(mgr)
-	if err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "SharedSecret")
-		os.Exit(1)
-	}
+	// err = (&controllers.SharedSecretReconciler{
+	// 	Client: mgr.GetClient(),
+	// 	Log:    ctrl.Log.WithName("controllers").WithName("SharedSecret"),
+	//      Scheme: mgr.GetScheme(),
+	// }).SetupWithManager(mgr)
+	// if err != nil {
+	// 	setupLog.Error(err, "unable to create controller", "controller", "SharedSecret")
+	// 	os.Exit(1)
+	// }
+
 	// +kubebuilder:scaffold:builder
 
 	setupLog.Info("starting manager")
