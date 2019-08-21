@@ -23,6 +23,7 @@ import (
 
 	"tattletale/controllers"
 
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -38,6 +39,7 @@ var (
 func init() {
 
 	_ = tattletalev1beta1.AddToScheme(scheme)
+	_ = corev1.AddToScheme(scheme)
 	// +kubebuilder:scaffold:scheme
 }
 

@@ -57,8 +57,13 @@ func (r *SharedConfigMapReconciler) Reconcile(req ctrl.Request) (ctrl.Result, er
 
 	// Check if source configmap actually exists, if not skip
 	if err := r.Get(ctx, client.ObjectKey{Namespace: sharedconfigmap.Spec.SourceNamespace, Name: sharedconfigmap.Spec.SourceConfigMap}, &sourceconfigmap); err != nil {
-		log.V(1).Info("source configmap does not exist. skipping sync.")
-		return ctrl.Result{Requeue: true}, nil
+		if !apierrors.IsNotFound(err) {
+			log.Error(err, "unable to get configmap")
+			return ctrl.Result{}, err
+		} else {
+			log.V(1).Info("source configmap does not exist. skipping sync.")
+			return ctrl.Result{Requeue: true}, nil
+		}
 	}
 
 	// Loop through target namespaces and create/update configmaps
@@ -72,14 +77,14 @@ func (r *SharedConfigMapReconciler) Reconcile(req ctrl.Request) (ctrl.Result, er
 				return ctrl.Result{}, err
 			} else {
 				// Skip if namespace does not exist
-				log.V(1).Info(v, "namespace does not exist. skipping sync here")
+				log.V(1).Info("namespace does not exist. skipping sync", "namespace", v)
 				continue
 			}
 		}
 
 		configmapFound := true
 		// Test if configmap exists
-		if err := r.Get(ctx, client.ObjectKey{Namespace: v, Name: sharedconfigmap.Spec.SourceConfigMap}, &configmap); err != nil {
+		if err := r.Get(ctx, client.ObjectKey{Namespace: v, Name: sharedconfigmap.Spec.SourceConfigMap}, &sourceconfigmap); err != nil {
 			if !apierrors.IsNotFound(err) {
 				log.Error(err, "unable to get pod")
 				return ctrl.Result{}, err
@@ -88,7 +93,8 @@ func (r *SharedConfigMapReconciler) Reconcile(req ctrl.Request) (ctrl.Result, er
 		}
 
 		var targetconfigmap corev1.ConfigMap
-		targetconfigmap.ObjectMeta = sourceconfigmap.ObjectMeta
+		// targetconfigmap.ObjectMeta = sourceconfigmap.ObjectMeta
+		// TODO: copy annotations and labels if config flag makes it so
 		targetconfigmap.Name = sharedconfigmap.Spec.SourceConfigMap
 		targetconfigmap.Namespace = v
 		targetconfigmap.Data = sourceconfigmap.Data
@@ -106,6 +112,8 @@ func (r *SharedConfigMapReconciler) Reconcile(req ctrl.Request) (ctrl.Result, er
 			if err := r.Create(ctx, &targetconfigmap); err != nil {
 				log.Error(err, "unable to create configmap in target namespace")
 				return ctrl.Result{}, err
+			} else {
+				log.V(1).Info("Succesfully created configmap", "namespace", v)
 			}
 
 		} else {
@@ -115,6 +123,8 @@ func (r *SharedConfigMapReconciler) Reconcile(req ctrl.Request) (ctrl.Result, er
 			if err := r.Update(ctx, &targetconfigmap); err != nil {
 				log.Error(err, "unable to update configmap in target namespace")
 				return ctrl.Result{}, err
+			} else {
+				log.V(1).Info("Succesfully updated configmap", "namespace", v)
 			}
 
 		}
@@ -122,6 +132,7 @@ func (r *SharedConfigMapReconciler) Reconcile(req ctrl.Request) (ctrl.Result, er
 	}
 
 	// TODO: should we tolerate 'partial' errors
+        // TODO: dealing with deletion of CRD, what to do with other objects
 	return ctrl.Result{}, nil
 
 }
