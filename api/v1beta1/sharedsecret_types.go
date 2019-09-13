@@ -24,27 +24,27 @@ import (
 
 // SharedSecretSpec defines the desired state of SharedSecret
 type SharedSecretSpec struct {
-        // The name of the source secret to be shared
-        SourceSecret string `json:"sourceSecret"`
+	// The name of the source secret to be shared
+	SourceSecret string `json:"sourceSecret"`
 
-        // The namespace of the source secret to be shared
-        SourceNamespace string `json:"sourceNamespace"`
+	// The namespace of the source secret to be shared
+	SourceNamespace string `json:"sourceNamespace"`
 
-        // The sync period (default: 30s)
-        // +optional
-        SyncPeriod string `json:"syncPeriod,omitempty"`
+	// The sync period (default: 30s)
+	// +optional
+	SyncPeriod string `json:"syncPeriod,omitempty"`
 
-        // The list of target namespaces to sync to
-        TargetNamespaces []string `json:"targetNamespaces"`
+	// The list of target namespaces to sync to
+	TargetNamespaces []string `json:"targetNamespaces"`
 }
 
 // SharedSecretStatus defines the observed state of SharedSecret
 type SharedSecretStatus struct {
-        // The status of the source secret to be shared
-        SourceSecret string `json:"sourceSecret"`
+	// The status of the source secret to be shared
+	SourceSecret string `json:"sourceSecret"`
 
-        // The status of target secrets to be synched
-        TargetSecrets []string `json:"targetSecrets"`
+	// The status of target secrets to be synched
+	TargetSecrets []string `json:"targetSecrets"`
 }
 
 // +kubebuilder:object:root=true

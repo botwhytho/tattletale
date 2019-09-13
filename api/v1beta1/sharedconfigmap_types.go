@@ -19,22 +19,33 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
-// NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
-
 // SharedConfigMapSpec defines the desired state of SharedConfigMap
 type SharedConfigMapSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
+	// The name of the source configmap to be shared
+	SourceConfigMap string `json:"sourceConfigMap"`
+
+	// The namespace of the source configmap to be shared
+	SourceNamespace string `json:"sourceNamespace"`
+
+	// The sync period (default: 30s)
+	// +optional
+	SyncPeriod string `json:"syncPeriod,omitempty"`
+
+	// The list of target namespaces to sync to
+	TargetNamespaces []string `json:"targetNamespaces"`
 }
 
 // SharedConfigMapStatus defines the observed state of SharedConfigMap
 type SharedConfigMapStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
+	// The status of the source configmap to be shared
+	SourceConfigMap string `json:"sourceConfigMap"`
+
+	// The status of target configmap to be synched
+	TargetConfigMaps []string `json:"targetConfigMaps"`
 }
 
 // +kubebuilder:object:root=true
+// +kubebuilder:subresource:status
 
 // SharedConfigMap is the Schema for the sharedconfigmaps API
 type SharedConfigMap struct {
