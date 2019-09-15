@@ -63,7 +63,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	controller, err := (&controllers.SharedConfigMapReconciler{
+	sharedConfigMapController, err := (&controllers.SharedConfigMapReconciler{
 		Client: mgr.GetClient(),
 		Log:    ctrl.Log.WithName("controllers").WithName("SharedConfigMap"),
 		Scheme: mgr.GetScheme(),
@@ -73,36 +73,59 @@ func main() {
 		os.Exit(1)
 	}
 
-	// sharedSecretController, err = (&controllers.SharedSecretReconciler{
-	// 	Client: mgr.GetClient(),
-	// 	Log:    ctrl.Log.WithName("controllers").WithName("SharedSecret"),
-	//  Scheme: mgr.GetScheme(),
-	// }).SetupWithManager(mgr)
-	// if err != nil {
-	// 	setupLog.Error(err, "unable to create controller", "controller", "SharedSecret")
-	// 	os.Exit(1)
-	// }
-
-	sharedcache := utils.InitReverseCache()
+	sharedConfigMapCache := utils.InitReverseCache()
 
 	// SharedConfigMap Watch
-	if err := controller.Watch(utils.InitSharedConfigMapWatch(sharedcache)); err != nil {
+	if err := sharedConfigMapController.Watch(utils.InitSharedConfigMapWatch(sharedConfigMapCache)); err != nil {
 		// return err
 		setupLog.Error(err, "problem setting up sharedconfigmap watcher")
 		os.Exit(1)
 	}
 
 	// Namespace Watch
-	if err := controller.Watch(utils.InitNamespaceWatch(sharedcache)); err != nil {
+	if err := sharedConfigMapController.Watch(utils.InitNamespaceWatch(sharedConfigMapCache)); err != nil {
 		// return err
 		setupLog.Error(err, "problem setting up namespace watcher")
 		os.Exit(1)
 	}
 
 	// ConfigMap Watch
-	if err := controller.Watch(utils.InitConfigMapWatch(sharedcache)); err != nil {
+	if err := sharedConfigMapController.Watch(utils.InitConfigMapWatch(sharedConfigMapCache)); err != nil {
 		// return err
 		setupLog.Error(err, "problem setting up configmap watcher")
+		os.Exit(1)
+	}
+
+	sharedSecretController, err := (&controllers.SharedSecretReconciler{
+		Client: mgr.GetClient(),
+		Log:    ctrl.Log.WithName("controllers").WithName("SharedSecret"),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr)
+	if err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "SharedSecret")
+		os.Exit(1)
+	}
+
+	sharedSecretCache := utils.InitReverseCache()
+
+	// SharedSecret Watch
+	if err := sharedSecretController.Watch(utils.InitSharedSecretWatch(sharedSecretCache)); err != nil {
+		// return err
+		setupLog.Error(err, "problem setting up sharedsecret watcher")
+		os.Exit(1)
+	}
+
+	// Namespace Watch
+	if err := sharedSecretController.Watch(utils.InitNamespaceWatch(sharedSecretCache)); err != nil {
+		// return err
+		setupLog.Error(err, "problem setting up namespace watcher")
+		os.Exit(1)
+	}
+
+	// ConfigMap Watch
+	if err := sharedSecretController.Watch(utils.InitSecretWatch(sharedSecretCache)); err != nil {
+		// return err
+		setupLog.Error(err, "problem setting up secret watcher")
 		os.Exit(1)
 	}
 

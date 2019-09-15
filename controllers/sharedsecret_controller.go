@@ -19,8 +19,10 @@ import (
 	"context"
 
 	"github.com/go-logr/logr"
+	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/controller"
 
 	tattletalev1beta1 "tattletale/api/v1beta1"
 )
@@ -28,7 +30,8 @@ import (
 // SharedSecretReconciler reconciles a SharedSecret object
 type SharedSecretReconciler struct {
 	client.Client
-	Log logr.Logger
+	Log    logr.Logger
+	Scheme *runtime.Scheme
 }
 
 // +kubebuilder:rbac:groups=tattletale.tattletale.dev,resources=sharedsecrets,verbs=get;list;watch;create;update;patch;delete
@@ -43,8 +46,8 @@ func (r *SharedSecretReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error
 	return ctrl.Result{}, nil
 }
 
-func (r *SharedSecretReconciler) SetupWithManager(mgr ctrl.Manager) error {
+func (r *SharedSecretReconciler) SetupWithManager(mgr ctrl.Manager) (controller.Controller, error) {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&tattletalev1beta1.SharedSecret{}).
-		Complete(r)
+		Build(r)
 }

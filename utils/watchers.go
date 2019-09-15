@@ -36,7 +36,7 @@ func InitSharedConfigMapWatch(cache *SharedReverseCache) (*source.Kind, *handler
 	return &source.Kind{Type: &tattletalev1beta1.SharedConfigMap{}}, &handler.EnqueueRequestsFromMapFunc{ToRequests: cache}, sharedConfigMapPredicate
 }
 
-func InitSharedSecretMapWatch(cache *SharedReverseCache) (*source.Kind, *handler.EnqueueRequestsFromMapFunc, *predicate.Funcs) {
+func InitSharedSecretWatch(cache *SharedReverseCache) (*source.Kind, *handler.EnqueueRequestsFromMapFunc, *predicate.Funcs) {
 
 	sharedSecretPredicate := &predicate.Funcs{
 		CreateFunc: func(e event.CreateEvent) bool { return true },
