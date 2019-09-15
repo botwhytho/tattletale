@@ -31,7 +31,7 @@ import (
 )
 
 var (
-	setupLog = ctrl.Log.WithName("setup")
+	handlerLog = ctrl.Log.WithName("handler")
 )
 
 type DependentsReverseCache struct {
@@ -105,7 +105,7 @@ func (s *SharedReverseCache) Map(o handler.MapObject) []reconcile.Request {
 
 	case *tattletalev1beta1.SharedConfigMap:
 		m := o.Object.(*tattletalev1beta1.SharedConfigMap)
-		setupLog.Info("Handling event", fmt.Sprintf("%T", t), o.Meta.GetName())
+		handlerLog.Info("Handling event", "namespace", o.Meta.GetNamespace(), fmt.Sprintf("%T", t), o.Meta.GetName())
 		namespacedname := strings.Join([]string{o.Meta.GetNamespace(), o.Meta.GetName()}, "/")
 		// Creating/Updating Reverse Cache for Namespaces & Target ConfigMaps
 		for _, v := range m.Spec.TargetNamespaces {
@@ -116,13 +116,10 @@ func (s *SharedReverseCache) Map(o handler.MapObject) []reconcile.Request {
 		}
 		// Creating/Updating Reverse Cache for Source Configmaps
 		s.sourcesCache.Insert(types.NamespacedName{Namespace: m.Spec.SourceNamespace, Name: m.Spec.SourceConfigMap}, namespacedname)
-		setupLog.Info("namespace cache created", "cache:", s.namespaceCache.String())
-		setupLog.Info("sources cache created", "cache:", s.sourcesCache.String())
-		setupLog.Info("targets cache created", "cache:", s.targetsCache.String())
 
 	case *tattletalev1beta1.SharedSecret:
 		m := o.Object.(*tattletalev1beta1.SharedSecret)
-		setupLog.Info("Handling event", fmt.Sprintf("%T", t), o.Meta.GetName())
+		handlerLog.Info("Handling event", "namespace", o.Meta.GetNamespace(), fmt.Sprintf("%T", t), o.Meta.GetName())
 		namespacedname := strings.Join([]string{o.Meta.GetNamespace(), o.Meta.GetName()}, "/")
 		// Creating/Updating Reverse Cache for Namespaces & Target ConfigMaps
 		for _, v := range m.Spec.TargetNamespaces {
@@ -133,15 +130,12 @@ func (s *SharedReverseCache) Map(o handler.MapObject) []reconcile.Request {
 		}
 		// Creating/Updating Reverse Cache for Source Configmaps
 		s.sourcesCache.Insert(types.NamespacedName{Namespace: m.Spec.SourceNamespace, Name: m.Spec.SourceSecret}, namespacedname)
-		setupLog.Info("namespace cache created", "cache:", s.namespaceCache.String())
-		setupLog.Info("sources cache created", "cache:", s.sourcesCache.String())
-		setupLog.Info("targets cache created", "cache:", s.targetsCache.String())
 
 	case *corev1.Namespace:
 		request := reconcile.Request{}
 		ns, ok := s.namespaceCache.GetSet(types.NamespacedName{Namespace: o.Meta.GetNamespace(), Name: o.Meta.GetName()})
 		if ok {
-			setupLog.Info("Handling event", fmt.Sprintf("%T", t), o.Meta.GetName())
+			handlerLog.Info("Handling event", "namespace", o.Meta.GetNamespace(), fmt.Sprintf("%T", t), o.Meta.GetName())
 		}
 		for _, req := range ns.List() {
 			request.Namespace = strings.Split(req, "/")[0]
@@ -153,7 +147,7 @@ func (s *SharedReverseCache) Map(o handler.MapObject) []reconcile.Request {
 		request := reconcile.Request{}
 		source, ok := s.sourcesCache.GetSet(types.NamespacedName{Namespace: o.Meta.GetNamespace(), Name: o.Meta.GetName()})
 		if ok {
-			setupLog.Info("Handling event", fmt.Sprintf("%T", t), o.Meta.GetName())
+			handlerLog.Info("Handling source event", "namespace", o.Meta.GetNamespace(), fmt.Sprintf("%T", t), o.Meta.GetName())
 		}
 		for _, req := range source.List() {
 			request.Namespace = strings.Split(req, "/")[0]
@@ -163,7 +157,7 @@ func (s *SharedReverseCache) Map(o handler.MapObject) []reconcile.Request {
 
 		target, ok := s.targetsCache.GetSet(types.NamespacedName{Namespace: o.Meta.GetNamespace(), Name: o.Meta.GetName()})
 		if ok {
-			setupLog.Info("Handling event", fmt.Sprintf("%T", t), o.Meta.GetName())
+			handlerLog.Info("Handling target event", "namespace", o.Meta.GetNamespace(), fmt.Sprintf("%T", t), o.Meta.GetName())
 		}
 		for _, req := range target.List() {
 			request := reconcile.Request{}
