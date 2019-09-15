@@ -27,10 +27,6 @@ type SharedConfigMapSpec struct {
 	// The namespace of the source configmap to be shared
 	SourceNamespace string `json:"sourceNamespace"`
 
-	// The sync period (default: 30s)
-	// +optional
-	SyncPeriod string `json:"syncPeriod,omitempty"`
-
 	// The list of target namespaces to sync to
 	TargetNamespaces []string `json:"targetNamespaces"`
 }
