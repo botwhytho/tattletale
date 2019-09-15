@@ -100,7 +100,6 @@ func (r *SharedConfigMapReconciler) Reconcile(req ctrl.Request) (ctrl.Result, er
 		temp.Data = sourceconfigmap.Data
 		temp.BinaryData = sourceconfigmap.BinaryData
 		newTargetConfigMap := temp.DeepCopyObject()
-		log.V(1).Info("cm data", "namespace", v, "name", temp.Name, "data", temp.Data)
 
 		// Creating configmap
 		if !configmapFound {
@@ -114,7 +113,7 @@ func (r *SharedConfigMapReconciler) Reconcile(req ctrl.Request) (ctrl.Result, er
 
 		} else {
 			// Updating configmap.
-			// ###TODO update only if hashes have changed, downstream repercussions of redundantly updating
+			// ### TODO update only if hashes have changed, downstream repercussions of redundantly updating
 			// ### TODO: Think of updating status, here and in other places
 
 			if err := r.Update(ctx, newTargetConfigMap); err != nil {

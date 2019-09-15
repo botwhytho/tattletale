@@ -7,25 +7,17 @@ metadata:
   name: manager-role
 rules:
 - apiGroups:
-  - tattletale.tattletale.dev
+  - ""
   resources:
-  - sharedconfigmaps
+  - configmaps
   verbs:
+  - create
+  - delete
   - get
   - list
+  - patch
+  - update
   - watch
-  - create
-  - update
-  - patch
-  - delete
-- apiGroups:
-  - tattletale.tattletale.dev
-  resources:
-  - sharedconfigmaps/status
-  verbs:
-  - get
-  - update
-  - patch
 - apiGroups:
   - ""
   resources:
@@ -41,34 +33,42 @@ rules:
   verbs:
   - get
 - apiGroups:
-  - ""
+  - tattletale.tattletale.dev
   resources:
-  - configmaps
+  - sharedconfigmaps
   verbs:
+  - create
+  - delete
   - get
   - list
-  - watch
-  - create
-  - update
   - patch
-  - delete
+  - update
+  - watch
+- apiGroups:
+  - tattletale.tattletale.dev
+  resources:
+  - sharedconfigmaps/status
+  verbs:
+  - get
+  - patch
+  - update
 - apiGroups:
   - tattletale.tattletale.dev
   resources:
   - sharedsecrets
   verbs:
+  - create
+  - delete
   - get
   - list
-  - watch
-  - create
-  - update
   - patch
-  - delete
+  - update
+  - watch
 - apiGroups:
   - tattletale.tattletale.dev
   resources:
   - sharedsecrets/status
   verbs:
   - get
-  - update
   - patch
+  - update
