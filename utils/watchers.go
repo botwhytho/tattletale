@@ -36,23 +36,45 @@ func InitSharedConfigMapWatch(cache *SharedReverseCache) (*source.Kind, *handler
 	return &source.Kind{Type: &tattletalev1beta1.SharedConfigMap{}}, &handler.EnqueueRequestsFromMapFunc{ToRequests: cache}, sharedConfigMapPredicate
 }
 
-func InitNamespaceWatch(cache *SharedReverseCache) (*source.Kind, *handler.EnqueueRequestsFromMapFunc, *predicate.Funcs) {
+func InitSharedSecretMapWatch(cache *SharedReverseCache) (*source.Kind, *handler.EnqueueRequestsFromMapFunc, *predicate.Funcs) {
 
-	sharedConfigMapPredicate := &predicate.Funcs{
-		CreateFunc: func(e event.CreateEvent) bool { return true },
-		DeleteFunc: func(e event.DeleteEvent) bool { return false },
-	}
-
-	return &source.Kind{Type: &corev1.Namespace{}}, &handler.EnqueueRequestsFromMapFunc{ToRequests: cache}, sharedConfigMapPredicate
-}
-
-func InitConfigMapWatch(cache *SharedReverseCache) (*source.Kind, *handler.EnqueueRequestsFromMapFunc, *predicate.Funcs) {
-
-	sharedConfigMapPredicate := &predicate.Funcs{
+	sharedSecretPredicate := &predicate.Funcs{
 		CreateFunc: func(e event.CreateEvent) bool { return true },
 		UpdateFunc: func(e event.UpdateEvent) bool { return true },
 		DeleteFunc: func(e event.DeleteEvent) bool { return true },
 	}
 
-	return &source.Kind{Type: &corev1.ConfigMap{}}, &handler.EnqueueRequestsFromMapFunc{ToRequests: cache}, sharedConfigMapPredicate
+	return &source.Kind{Type: &tattletalev1beta1.SharedSecret{}}, &handler.EnqueueRequestsFromMapFunc{ToRequests: cache}, sharedSecretPredicate
+}
+
+func InitNamespaceWatch(cache *SharedReverseCache) (*source.Kind, *handler.EnqueueRequestsFromMapFunc, *predicate.Funcs) {
+
+	namespacePredicate := &predicate.Funcs{
+		CreateFunc: func(e event.CreateEvent) bool { return true },
+		DeleteFunc: func(e event.DeleteEvent) bool { return false },
+	}
+
+	return &source.Kind{Type: &corev1.Namespace{}}, &handler.EnqueueRequestsFromMapFunc{ToRequests: cache}, namespacePredicate
+}
+
+func InitConfigMapWatch(cache *SharedReverseCache) (*source.Kind, *handler.EnqueueRequestsFromMapFunc, *predicate.Funcs) {
+
+	configmapPredicate := &predicate.Funcs{
+		CreateFunc: func(e event.CreateEvent) bool { return true },
+		UpdateFunc: func(e event.UpdateEvent) bool { return true },
+		DeleteFunc: func(e event.DeleteEvent) bool { return true },
+	}
+
+	return &source.Kind{Type: &corev1.ConfigMap{}}, &handler.EnqueueRequestsFromMapFunc{ToRequests: cache}, configmapPredicate
+}
+
+func InitSecretWatch(cache *SharedReverseCache) (*source.Kind, *handler.EnqueueRequestsFromMapFunc, *predicate.Funcs) {
+
+	secretPredicate := &predicate.Funcs{
+		CreateFunc: func(e event.CreateEvent) bool { return true },
+		UpdateFunc: func(e event.UpdateEvent) bool { return true },
+		DeleteFunc: func(e event.DeleteEvent) bool { return true },
+	}
+
+	return &source.Kind{Type: &corev1.Secret{}}, &handler.EnqueueRequestsFromMapFunc{ToRequests: cache}, secretPredicate
 }
