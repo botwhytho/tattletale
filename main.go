@@ -27,11 +27,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 	ctrl "sigs.k8s.io/controller-runtime"
-	"sigs.k8s.io/controller-runtime/pkg/event"
-	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
-	"sigs.k8s.io/controller-runtime/pkg/predicate"
-	"sigs.k8s.io/controller-runtime/pkg/source"
 	// +kubebuilder:scaffold:imports
 )
 
@@ -89,63 +85,22 @@ func main() {
 
 	sharedcache := utils.InitReverseCache()
 
-	sharedConfigMapSource := &source.Kind{
-		Type: &tattletalev1beta1.SharedConfigMap{},
-	}
-
-	sharedConfigMapHandler := &handler.EnqueueRequestsFromMapFunc{
-		ToRequests: sharedcache,
-	}
-
-	sharedConfigMapPredicate := predicate.Funcs{
-		CreateFunc: func(e event.CreateEvent) bool { return true },
-		UpdateFunc: func(e event.UpdateEvent) bool { return true },
-		DeleteFunc: func(e event.DeleteEvent) bool { return true },
-	}
-
 	// SharedConfigMap Watch
-	if err := controller.Watch(sharedConfigMapSource, sharedConfigMapHandler, sharedConfigMapPredicate); err != nil {
+	if err := controller.Watch(utils.InitSharedConfigMapWatch(sharedcache)); err != nil {
 		// return err
 		setupLog.Error(err, "problem setting up sharedconfigmap watcher")
 		os.Exit(1)
 	}
 
-	namespaceSource := &source.Kind{
-		Type: &corev1.Namespace{},
-	}
-
-	namespaceHandler := &handler.EnqueueRequestsFromMapFunc{
-		ToRequests: sharedcache,
-	}
-
-	namespacePredicate := predicate.Funcs{
-		CreateFunc: func(e event.CreateEvent) bool { return true },
-		DeleteFunc: func(e event.DeleteEvent) bool { return false },
-	}
-
 	// Namespace Watch
-	if err := controller.Watch(namespaceSource, namespaceHandler, namespacePredicate); err != nil {
+	if err := controller.Watch(utils.InitNamespaceWatch(sharedcache)); err != nil {
 		// return err
 		setupLog.Error(err, "problem setting up namespace watcher")
 		os.Exit(1)
 	}
 
-	configMapSource := &source.Kind{
-		Type: &corev1.ConfigMap{},
-	}
-
-	configMapHandler := &handler.EnqueueRequestsFromMapFunc{
-		ToRequests: sharedcache,
-	}
-
-	configMapPredicate := predicate.Funcs{
-		CreateFunc: func(e event.CreateEvent) bool { return true },
-		UpdateFunc: func(e event.UpdateEvent) bool { return true },
-		DeleteFunc: func(e event.DeleteEvent) bool { return true },
-	}
-
 	// ConfigMap Watch
-	if err := controller.Watch(configMapSource, configMapHandler, configMapPredicate); err != nil {
+	if err := controller.Watch(utils.InitConfigMapWatch(sharedcache)); err != nil {
 		// return err
 		setupLog.Error(err, "problem setting up configmap watcher")
 		os.Exit(1)
