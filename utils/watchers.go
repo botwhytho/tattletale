@@ -16,13 +16,21 @@ limitations under the License.
 package utils
 
 import (
+	"os"
+
 	tattletalev1beta1 "tattletale/api/v1beta1"
 
 	corev1 "k8s.io/api/core/v1"
+	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/controller"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 	"sigs.k8s.io/controller-runtime/pkg/source"
+)
+
+var (
+	setupLog = ctrl.Log.WithName("setup")
 )
 
 func InitSharedConfigMapWatch(cache *SharedReverseCache) (*source.Kind, *handler.EnqueueRequestsFromMapFunc, *predicate.Funcs) {
@@ -77,4 +85,50 @@ func InitSecretWatch(cache *SharedReverseCache) (*source.Kind, *handler.EnqueueR
 	}
 
 	return &source.Kind{Type: &corev1.Secret{}}, &handler.EnqueueRequestsFromMapFunc{ToRequests: cache}, secretPredicate
+}
+
+func InitSharedConfigMapWatchers(controller controller.Controller) {
+
+	sharedConfigMapCache := InitReverseCache()
+
+	// SharedConfigMap Watch
+	if err := controller.Watch(InitSharedConfigMapWatch(sharedConfigMapCache)); err != nil {
+		setupLog.Error(err, "problem setting up sharedconfigmap watcher")
+		os.Exit(1)
+	}
+
+	// Namespace Watch
+	if err := controller.Watch(InitNamespaceWatch(sharedConfigMapCache)); err != nil {
+		setupLog.Error(err, "problem setting up namespace watcher")
+		os.Exit(1)
+	}
+
+	// ConfigMap Watch
+	if err := controller.Watch(InitConfigMapWatch(sharedConfigMapCache)); err != nil {
+		setupLog.Error(err, "problem setting up configmap watcher")
+		os.Exit(1)
+	}
+}
+
+func InitSharedSecretWatchers(controller controller.Controller) {
+
+	sharedSecretCache := InitReverseCache()
+
+	// SharedSecret Watch
+	if err := controller.Watch(InitSharedSecretWatch(sharedSecretCache)); err != nil {
+		setupLog.Error(err, "problem setting up sharedsecret watcher")
+		os.Exit(1)
+	}
+
+	// Namespace Watch
+	if err := controller.Watch(InitNamespaceWatch(sharedSecretCache)); err != nil {
+		setupLog.Error(err, "problem setting up namespace watcher")
+		os.Exit(1)
+	}
+
+	// Secret Watch
+	if err := controller.Watch(InitSecretWatch(sharedSecretCache)); err != nil {
+		setupLog.Error(err, "problem setting up secret watcher")
+		os.Exit(1)
+	}
 }

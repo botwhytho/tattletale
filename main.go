@@ -73,28 +73,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	sharedConfigMapCache := utils.InitReverseCache()
-
-	// SharedConfigMap Watch
-	if err := sharedConfigMapController.Watch(utils.InitSharedConfigMapWatch(sharedConfigMapCache)); err != nil {
-		// return err
-		setupLog.Error(err, "problem setting up sharedconfigmap watcher")
-		os.Exit(1)
-	}
-
-	// Namespace Watch
-	if err := sharedConfigMapController.Watch(utils.InitNamespaceWatch(sharedConfigMapCache)); err != nil {
-		// return err
-		setupLog.Error(err, "problem setting up namespace watcher")
-		os.Exit(1)
-	}
-
-	// ConfigMap Watch
-	if err := sharedConfigMapController.Watch(utils.InitConfigMapWatch(sharedConfigMapCache)); err != nil {
-		// return err
-		setupLog.Error(err, "problem setting up configmap watcher")
-		os.Exit(1)
-	}
+	utils.InitSharedConfigMapWatchers(sharedConfigMapController)
 
 	sharedSecretController, err := (&controllers.SharedSecretReconciler{
 		Client: mgr.GetClient(),
@@ -106,28 +85,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	sharedSecretCache := utils.InitReverseCache()
-
-	// SharedSecret Watch
-	if err := sharedSecretController.Watch(utils.InitSharedSecretWatch(sharedSecretCache)); err != nil {
-		// return err
-		setupLog.Error(err, "problem setting up sharedsecret watcher")
-		os.Exit(1)
-	}
-
-	// Namespace Watch
-	if err := sharedSecretController.Watch(utils.InitNamespaceWatch(sharedSecretCache)); err != nil {
-		// return err
-		setupLog.Error(err, "problem setting up namespace watcher")
-		os.Exit(1)
-	}
-
-	// ConfigMap Watch
-	if err := sharedSecretController.Watch(utils.InitSecretWatch(sharedSecretCache)); err != nil {
-		// return err
-		setupLog.Error(err, "problem setting up secret watcher")
-		os.Exit(1)
-	}
+	utils.InitSharedSecretWatchers(sharedSecretController)
 
 	// +kubebuilder:scaffold:builder
 
