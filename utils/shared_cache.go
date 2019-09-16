@@ -165,6 +165,30 @@ func (s *SharedReverseCache) Map(o handler.MapObject) []reconcile.Request {
 			request.Name = strings.Split(req, "/")[1]
 			requests = append(requests, request)
 		}
+
+	case *corev1.Secret:
+		request := reconcile.Request{}
+		source, ok := s.sourcesCache.GetSet(types.NamespacedName{Namespace: o.Meta.GetNamespace(), Name: o.Meta.GetName()})
+		if ok {
+			handlerLog.Info("Handling source event", "namespace", o.Meta.GetNamespace(), fmt.Sprintf("%T", t), o.Meta.GetName())
+		}
+		for _, req := range source.List() {
+			request.Namespace = strings.Split(req, "/")[0]
+			request.Name = strings.Split(req, "/")[1]
+			requests = append(requests, request)
+		}
+
+		target, ok := s.targetsCache.GetSet(types.NamespacedName{Namespace: o.Meta.GetNamespace(), Name: o.Meta.GetName()})
+		if ok {
+			handlerLog.Info("Handling target event", "namespace", o.Meta.GetNamespace(), fmt.Sprintf("%T", t), o.Meta.GetName())
+		}
+		for _, req := range target.List() {
+			request := reconcile.Request{}
+			request.Namespace = strings.Split(req, "/")[0]
+			request.Name = strings.Split(req, "/")[1]
+			requests = append(requests, request)
+		}
 	}
+
 	return requests
 }

@@ -63,7 +63,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	controller, err := (&controllers.SharedConfigMapReconciler{
+	sharedConfigMapController, err := (&controllers.SharedConfigMapReconciler{
 		Client: mgr.GetClient(),
 		Log:    ctrl.Log.WithName("controllers").WithName("SharedConfigMap"),
 		Scheme: mgr.GetScheme(),
@@ -73,38 +73,19 @@ func main() {
 		os.Exit(1)
 	}
 
-	// sharedSecretController, err = (&controllers.SharedSecretReconciler{
-	// 	Client: mgr.GetClient(),
-	// 	Log:    ctrl.Log.WithName("controllers").WithName("SharedSecret"),
-	//  Scheme: mgr.GetScheme(),
-	// }).SetupWithManager(mgr)
-	// if err != nil {
-	// 	setupLog.Error(err, "unable to create controller", "controller", "SharedSecret")
-	// 	os.Exit(1)
-	// }
+	utils.InitSharedConfigMapWatchers(sharedConfigMapController)
 
-	sharedcache := utils.InitReverseCache()
-
-	// SharedConfigMap Watch
-	if err := controller.Watch(utils.InitSharedConfigMapWatch(sharedcache)); err != nil {
-		// return err
-		setupLog.Error(err, "problem setting up sharedconfigmap watcher")
+	sharedSecretController, err := (&controllers.SharedSecretReconciler{
+		Client: mgr.GetClient(),
+		Log:    ctrl.Log.WithName("controllers").WithName("SharedSecret"),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr)
+	if err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "SharedSecret")
 		os.Exit(1)
 	}
 
-	// Namespace Watch
-	if err := controller.Watch(utils.InitNamespaceWatch(sharedcache)); err != nil {
-		// return err
-		setupLog.Error(err, "problem setting up namespace watcher")
-		os.Exit(1)
-	}
-
-	// ConfigMap Watch
-	if err := controller.Watch(utils.InitConfigMapWatch(sharedcache)); err != nil {
-		// return err
-		setupLog.Error(err, "problem setting up configmap watcher")
-		os.Exit(1)
-	}
+	utils.InitSharedSecretWatchers(sharedSecretController)
 
 	// +kubebuilder:scaffold:builder
 
