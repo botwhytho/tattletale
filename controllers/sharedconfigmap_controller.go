@@ -63,7 +63,7 @@ func (r *SharedConfigMapReconciler) Reconcile(req ctrl.Request) (ctrl.Result, er
 			return ctrl.Result{}, err
 		} else {
 			log.V(1).Info("source configmap does not exist. skipping sync.")
-			return ctrl.Result{Requeue: true}, nil
+			return ctrl.Result{}, nil
 		}
 	}
 

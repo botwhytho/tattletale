@@ -63,7 +63,7 @@ func (r *SharedSecretReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error
 			return ctrl.Result{}, err
 		} else {
 			log.V(1).Info("source secret does not exist. skipping sync.")
-			return ctrl.Result{Requeue: true}, nil
+			return ctrl.Result{}, nil
 		}
 	}
 
