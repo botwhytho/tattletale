@@ -1,0 +1,12 @@
+apiVersion: tattletale.tattletale.dev/v1beta1
+kind: SharedConfigMap
+metadata:
+  name: sharedconfigmap-sample1
+  namespace: tattletale-test
+spec:
+  sourceConfigMap: tattletale-configmap-sample1
+  sourceNamespace: tattletale-test
+  targetNamespaces:
+  - tattletale-test1
+  - tattletale-test2
+  - tattletale-test3
