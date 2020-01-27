@@ -33,6 +33,18 @@ rules:
   verbs:
   - get
 - apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
   - tattletale.tattletale.dev
   resources:
   - sharedconfigmaps

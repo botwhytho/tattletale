@@ -6,7 +6,8 @@ metadata:
 spec:
   sourceConfigMap: tattletale-configmap-sample1
   sourceNamespace: tattletale-test
-  targetNamespaces:
-  - tattletale-test1
-  - tattletale-test2
-  - tattletale-test3
+  targets:
+  - namespace: tattletale-test1
+  - namespace: tattletale-test2
+  - namespace: tattletale-test3
+    rename: tattletale-configmap-sample1-renamed

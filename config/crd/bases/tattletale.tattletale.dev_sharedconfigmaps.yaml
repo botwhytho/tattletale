@@ -38,15 +38,24 @@ spec:
             sourceNamespace:
               description: The namespace of the source configmap to be shared
               type: string
-            targetNamespaces:
+            targets:
               description: The list of target namespaces to sync to
               items:
-                type: string
+                description: Stores the namespace of a target and an optional 'Rename'
+                  if the configmap will be renamed in the target namespace
+                properties:
+                  namespace:
+                    type: string
+                  rename:
+                    type: string
+                required:
+                - namespace
+                type: object
               type: array
           required:
           - sourceConfigMap
           - sourceNamespace
-          - targetNamespaces
+          - targets
           type: object
         status:
           description: SharedConfigMapStatus defines the observed state of SharedConfigMap
