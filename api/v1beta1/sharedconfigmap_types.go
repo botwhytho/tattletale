@@ -20,7 +20,7 @@ import (
 )
 
 // Stores the namespace of a target and an optional 'NewName' if the configmap will be renamed in the target namespace
-type Target struct {
+type TargetConfigMap struct {
 	Namespace string `json:"namespace"`
 	NewName   string `json:"newName,omitempty"`
 }
@@ -34,7 +34,7 @@ type SharedConfigMapSpec struct {
 	SourceNamespace string `json:"sourceNamespace"`
 
 	// The list of target namespaces to sync to
-	Targets []Target `json:"targets"`
+	Targets []TargetConfigMap `json:"targets"`
 }
 
 // SharedConfigMapStatus defines the observed state of SharedConfigMap

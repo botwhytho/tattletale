@@ -20,7 +20,7 @@ import (
 )
 
 // Stores the namespace of a target and an optional 'NewName' if the secret will be renamed in the target namespace
-type Target struct {
+type TargetSecret struct {
 	Namespace string `json:"namespace"`
 	NewName   string `json:"newName,omitempty"`
 }
@@ -34,7 +34,7 @@ type SharedSecretSpec struct {
 	SourceNamespace string `json:"sourceNamespace"`
 
 	// The list of target namespaces to sync to
-	Targets []Target `json:"targets"`
+	Targets []TargetSecret `json:"targets"`
 }
 
 // SharedSecretStatus defines the observed state of SharedSecret

@@ -128,13 +128,19 @@ func (s *SharedReverseCache) Map(o handler.MapObject) []reconcile.Request {
 		handlerLog.Info("Handling event", "namespace", o.Meta.GetNamespace(), fmt.Sprintf("%T", t), o.Meta.GetName())
 		namespacedname := strings.Join([]string{o.Meta.GetNamespace(), o.Meta.GetName()}, "/")
 		// Creating/Updating Reverse Cache for Namespaces & Target ConfigMaps
-		for _, v := range m.Spec.TargetNamespaces {
+		for _, v := range m.Spec.Targets {
 			// Namespaces
-			s.namespaceCache.Insert(types.NamespacedName{Namespace: "", Name: v}, namespacedname)
-			// ConfigMaps
-			s.targetsCache.Insert(types.NamespacedName{Namespace: v, Name: m.Spec.SourceSecret}, namespacedname)
+			s.namespaceCache.Insert(types.NamespacedName{Namespace: "", Name: v.Namespace}, namespacedname)
+			// Secrets
+			secretName := ""
+			if v.NewName != "" {
+				secretName = v.NewName
+			} else {
+				secretName = m.Spec.SourceSecret
+			}
+			s.targetsCache.Insert(types.NamespacedName{Namespace: v.Namespace, Name: secretName}, namespacedname)
 		}
-		// Creating/Updating Reverse Cache for Source Configmaps
+		// Creating/Updating Reverse Cache for Source Secrets
 		s.sourcesCache.Insert(types.NamespacedName{Namespace: m.Spec.SourceNamespace, Name: m.Spec.SourceSecret}, namespacedname)
 
 	case *corev1.Namespace:
