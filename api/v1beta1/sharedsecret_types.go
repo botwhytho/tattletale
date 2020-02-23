@@ -19,6 +19,12 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+// Stores the namespace of a target and an optional 'NewName' if the secret will be renamed in the target namespace
+type Target struct {
+	Namespace string `json:"namespace"`
+	NewName   string `json:"newName,omitempty"`
+}
+
 // SharedSecretSpec defines the desired state of SharedSecret
 type SharedSecretSpec struct {
 	// The name of the source secret to be shared
@@ -28,7 +34,7 @@ type SharedSecretSpec struct {
 	SourceNamespace string `json:"sourceNamespace"`
 
 	// The list of target namespaces to sync to
-	TargetNamespaces []string `json:"targetNamespaces"`
+	Targets []Target `json:"targets"`
 }
 
 // SharedSecretStatus defines the observed state of SharedSecret
