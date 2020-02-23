@@ -68,9 +68,9 @@ func (r *SharedConfigMapReconciler) Reconcile(req ctrl.Request) (ctrl.Result, er
 	}
 
 	// Loop through target namespaces and create/update configmaps
-	for _, v := range sharedconfigmap.Spec.TargetNamespaces {
+	for _, v := range sharedconfigmap.Spec.Targets {
 		// Try and get namespace
-		if err := r.Get(ctx, client.ObjectKey{Namespace: "", Name: v}, &namespace); err != nil {
+		if err := r.Get(ctx, client.ObjectKey{Namespace: "", Name: v.Namespace}, &namespace); err != nil {
 			// Error out
 			// TODO: func ignoreNotFound from kubebuilder book, add to utils
 			if !apierrors.IsNotFound(err) {
@@ -85,8 +85,15 @@ func (r *SharedConfigMapReconciler) Reconcile(req ctrl.Request) (ctrl.Result, er
 
 		configmapFound := true
 		var targetconfigmap corev1.ConfigMap
+
+		configmapName := ""
+		if v.NewName != "" {
+			configmapName = v.NewName
+		} else {
+			configmapName = sharedconfigmap.Spec.SourceConfigMap
+		}
 		// Test if configmap exists
-		if err := r.Get(ctx, client.ObjectKey{Namespace: v, Name: sharedconfigmap.Spec.SourceConfigMap}, &targetconfigmap); err != nil {
+		if err := r.Get(ctx, client.ObjectKey{Namespace: v.Namespace, Name: configmapName}, &targetconfigmap); err != nil {
 			if !apierrors.IsNotFound(err) {
 				log.Error(err, "unable to get configmap")
 				return ctrl.Result{}, err
@@ -95,8 +102,8 @@ func (r *SharedConfigMapReconciler) Reconcile(req ctrl.Request) (ctrl.Result, er
 		}
 
 		temp := corev1.ConfigMap{}
-		temp.Name = sharedconfigmap.Spec.SourceConfigMap
-		temp.Namespace = v
+		temp.Name = configmapName
+		temp.Namespace = v.Namespace
 		temp.Data = sourceconfigmap.Data
 		temp.BinaryData = sourceconfigmap.BinaryData
 		newTargetConfigMap := temp.DeepCopyObject()

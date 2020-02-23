@@ -68,9 +68,9 @@ func (r *SharedSecretReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error
 	}
 
 	// Loop through target namespaces and create/update secrets
-	for _, v := range sharedsecret.Spec.TargetNamespaces {
+	for _, v := range sharedsecret.Spec.Targets {
 		// Try and get namespace
-		if err := r.Get(ctx, client.ObjectKey{Namespace: "", Name: v}, &namespace); err != nil {
+		if err := r.Get(ctx, client.ObjectKey{Namespace: "", Name: v.Namespace}, &namespace); err != nil {
 			// Error out
 			// TODO: func ignoreNotFound from kubebuilder book, add to utils
 			if !apierrors.IsNotFound(err) {
@@ -85,8 +85,15 @@ func (r *SharedSecretReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error
 
 		secretFound := true
 		var targetsecret corev1.Secret
+
+		secretName := ""
+		if v.NewName != "" {
+			secretName = v.NewName
+		} else {
+			secretName = sharedsecret.Spec.SourceSecret
+		}
 		// Test if secret exists
-		if err := r.Get(ctx, client.ObjectKey{Namespace: v, Name: sharedsecret.Spec.SourceSecret}, &targetsecret); err != nil {
+		if err := r.Get(ctx, client.ObjectKey{Namespace: v.Namespace, Name: secretName}, &targetsecret); err != nil {
 			if !apierrors.IsNotFound(err) {
 				log.Error(err, "unable to get secret")
 				return ctrl.Result{}, err
@@ -95,8 +102,8 @@ func (r *SharedSecretReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error
 		}
 
 		temp := corev1.Secret{}
-		temp.Name = sharedsecret.Spec.SourceSecret
-		temp.Namespace = v
+		temp.Name = secretName
+		temp.Namespace = v.Namespace
 		temp.Data = sourcesecret.Data
 		newTargetSecret := temp.DeepCopyObject()
 
