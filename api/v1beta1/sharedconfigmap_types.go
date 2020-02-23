@@ -19,10 +19,10 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// Stores the namespace of a target and an optional 'Rename' if the configmap will be renamed in the target namespace
+// Stores the namespace of a target and an optional 'NewName' if the configmap will be renamed in the target namespace
 type Target struct {
 	Namespace string `json:"namespace"`
-	Rename    string `json:"rename,omitempty"`
+	NewName   string `json:"newName,omitempty"`
 }
 
 // SharedConfigMapSpec defines the desired state of SharedConfigMap

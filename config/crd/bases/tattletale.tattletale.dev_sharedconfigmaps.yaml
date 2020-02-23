@@ -41,12 +41,12 @@ spec:
             targets:
               description: The list of target namespaces to sync to
               items:
-                description: Stores the namespace of a target and an optional 'Rename'
+                description: Stores the namespace of a target and an optional 'NewName'
                   if the configmap will be renamed in the target namespace
                 properties:
                   namespace:
                     type: string
-                  rename:
+                  newName:
                     type: string
                 required:
                 - namespace

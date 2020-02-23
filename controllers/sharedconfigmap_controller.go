@@ -87,8 +87,8 @@ func (r *SharedConfigMapReconciler) Reconcile(req ctrl.Request) (ctrl.Result, er
 		var targetconfigmap corev1.ConfigMap
 
 		configmapName := ""
-		if v.Rename != "" {
-			configmapName = v.Rename
+		if v.NewName != "" {
+			configmapName = v.NewName
 		} else {
 			configmapName = sharedconfigmap.Spec.SourceConfigMap
 		}

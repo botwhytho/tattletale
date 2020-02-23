@@ -10,4 +10,4 @@ spec:
   - namespace: tattletale-test4
   - namespace: tattletale-test5
   - namespace: tattletale-test6
-    rename: tattletale-configmap-sample1-renamed
+    newName: tattletale-configmap-sample1-renamed

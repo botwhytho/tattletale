@@ -113,8 +113,8 @@ func (s *SharedReverseCache) Map(o handler.MapObject) []reconcile.Request {
 			s.namespaceCache.Insert(types.NamespacedName{Namespace: "", Name: v.Namespace}, namespacedname)
 			// ConfigMaps
 			configmapName := ""
-			if v.Rename != "" {
-				configmapName = v.Rename
+			if v.NewName != "" {
+				configmapName = v.NewName
 			} else {
 				configmapName = m.Spec.SourceConfigMap
 			}
